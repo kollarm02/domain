@@ -1,6 +1,6 @@
 <script>
 	import Game from './Game.svelte';
-  </script>
+</script>
   
   <main>
 	<Game />
