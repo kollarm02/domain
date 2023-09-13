@@ -3,18 +3,18 @@
 	import Game from './Game.svelte';
 </script>
   
-  <main>
+<main>
 	<Game />
-  </main>
+</main>
   
-  <style>
+<style>
 	/* Stílusoldal */
 	main {
-	  display: flex;
-	  justify-content: center;
-	  align-items: center;
-	  height: 100vh;
-	  background-color:darkseagreen;
-	}
-  </style>
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	background-color:darkseagreen;
+}
+</style>
   
