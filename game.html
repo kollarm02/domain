@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kő, Papír, Olló</title>
+    <link rel="stylesheet" href="gamestyle.css">
+</head>
+<body>
+    <h1>Kő, Papír, Olló</h1>
+    <h3>Kattints valamelyik gombra!</h3>
+    <button onclick="jatek('kő')">Kő</button>
+    <button onclick="jatek('papír')">Papír</button>
+    <button onclick="jatek('olló')">Olló</button>
+    <div id="eredmeny"></div>
+    <a href="index.html">Vissza a főoldalra</a>
+
+    <script>
+        function jatek(jatekosValasztas) {
+            var lehetosegek = ['kő', 'papír', 'olló'];
+            var gepValasztas = lehetosegek[Math.floor(Math.random() * 3)];
+
+            var eredmeny;
+            if (jatekosValasztas === gepValasztas) {
+                eredmeny = 'Döntetlen!';
+            } else if (
+                (jatekosValasztas === 'kő' && gepValasztas === 'olló') ||
+                (jatekosValasztas === 'papír' && gepValasztas === 'kő') ||
+                (jatekosValasztas === 'olló' && gepValasztas === 'papír')
+            ) {
+                eredmeny = 'Nyertél!';
+            } else {
+                eredmeny = 'Vesztettél!';
+            }
+
+            var eredmenyDiv = document.getElementById('eredmeny');
+            eredmenyDiv.textContent = `Te választásod: ${jatekosValasztas}, a gép választotta: ${gepValasztas}. Eredmény: ${eredmeny}`;
+        }
+    </script>
+</body>
+</html>
