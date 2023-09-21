@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Készségfejlesztő játék</title>
+  <style>
+    body {
+      background-color: #28a745;
+    }
+    h1{
+      font-size: 40px;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      text-align: center;
+    }
+    p{
+      font-size: 25px;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      text-align: center;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      grid-gap: 10px;
+      justify-content: center;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      background-color: #ddd;
+      border: 5px solid #aaa;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .character {
+      background-color: #007bff;
+      color: white;
+      font-size: 20px;
+    }
+    .goal {
+      background-color: #f1870e;
+      color: white;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Készségfejlesztő játék</h1>
+  <p>Mozgasd el a karaktert a célmezőbe! <br> A kék vagy Te és a narancssárga pedig a cél!</p>
+  <div id="game-board"></div>
+  <p id="message"></p>
+
+  <script>
+    const rows = 5;
+    const columns = 5;
+    let characterPosition;
+    let goalPosition;
+
+    function getRandomPosition() {
+      const x = Math.floor(Math.random() * columns);
+      const y = Math.floor(Math.random() * rows);
+      return { x, y };
+    }
+
+    function createCell(x, y) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      if (x === characterPosition.x && y === characterPosition.y) {
+        cell.classList.add('character');
+      } else if (x === goalPosition.x && y === goalPosition.y) {
+        cell.classList.add('goal');
+      }
+      return cell;
+    }
+
+    function renderBoard() {
+      const gameBoard = document.getElementById('game-board');
+      gameBoard.innerHTML = '';
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < columns; x++) {
+          const cell = createCell(x, y);
+          gameBoard.appendChild(cell);
+        }
+      }
+    }
+
+    function setMessage(message) {
+      document.getElementById('message').textContent = message;
+    }
+
+    function moveCharacter(event) {
+      let newX = characterPosition.x;
+      let newY = characterPosition.y;
+
+      switch (event.key) {
+        case 'ArrowUp':
+          newY = Math.max(newY - 1, 0);
+          break;
+        case 'ArrowDown':
+          newY = Math.min(newY + 1, rows - 1);
+          break;
+        case 'ArrowLeft':
+          newX = Math.max(newX - 1, 0);
+          break;
+        case 'ArrowRight':
+          newX = Math.min(newX + 1, columns - 1);
+          break;
+      }
+
+      if (newX === goalPosition.x && newY === goalPosition.y) {
+        setMessage('Gratulálok, megnyerted a játékot!');
+        window.removeEventListener('keydown', moveCharacter);
+
+        setTimeout(() => {
+          characterPosition = getRandomPosition();
+          renderBoard();
+          setMessage('Mozgasd a karaktert a célmezőbe nyilakkal!');
+          window.addEventListener('keydown', moveCharacter);
+        }, 1000);
+      } else {
+        characterPosition = { x: newX, y: newY };
+        renderBoard();
+      }
+    }
+
+    characterPosition = getRandomPosition();
+    goalPosition = getRandomPosition();
+    renderBoard();
+    setMessage('Mozgasd a karaktert a célmezőbe nyilakkal!');
+    window.addEventListener('keydown', moveCharacter);
+  </script>
+</body>
+</html>
