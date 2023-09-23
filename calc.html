@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Számológép</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: bisque;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+        }
+
+        .calculator {
+            width: 300px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color:cadetblue;
+        }
+
+        input[type="text"] {
+            width: 278px;
+            padding: 10px;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        
+        .egyenlo {
+            display: grid;
+            grid-template-columns: (4, 1fr);
+            grid-column: span 4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Számológép</h1>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="torol()">C</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <div class="egyenlo">
+                <button onclick="szamol()">=</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let displayValue = "";
+
+        function appendToDisplay(value) {
+            displayValue += value;
+            document.getElementById("display").value = displayValue;
+        }
+
+        function torol() {
+            displayValue = "";
+            document.getElementById("display").value = displayValue;
+        }
+
+        function szamol() {
+            try {
+                const result = eval(displayValue);
+                displayValue = result.toString();
+                document.getElementById("display").value = displayValue;
+            } catch (error) {
+                displayValue = "Hiba";
+                document.getElementById("display").value = displayValue;
+            }
+        }
+    </script>
+</body>
+</html>
