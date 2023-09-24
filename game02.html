@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake játék</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+            background-color:bisque;
+            text-align: center;
+        }
+        html {
+            background-image: url('snake.jpg');
+        }
+        h1 {
+            text-align: center;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 40px;
+        }
+        p {
+            text-align: center;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 25px;
+            font-weight: bolder;
+        }
+        a {
+            text-align: center;
+            font-size: 30px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            
+        }
+        div {
+            text-align: center;
+            font-size: 25px;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-weight: bolder;
+
+        }
+    </style>
+</head>
+<body>
+    <h1>Etetsd kígyó</h1>
+    <p>Etetsd meg a kígyót!</p>
+    <p>Irányítsd a fel-, le-, jobbra- és balra gombokkal úgy, hogy a zöld kígyó eljussun a piros eledelhez.</p> <br>
+    <canvas id="snakeCanvas" width="400" height="400"></canvas> <br>
+    <div id="gameover"></div>
+    <a href="index.html">Vissza a főoldalra</a> <br>
+    <a href="tasks.html">Vissza a feladatokhoz</a>
+    <script>
+        const canvas = document.getElementById("snakeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const snakeSize = 20;
+        const snakeSpeed = 200;
+        const snakeColor = "green";
+
+        let snakeX = canvas.width / 2;
+        let snakeY = canvas.height / 2;
+
+        let dx = snakeSize;
+        let dy = 0;
+
+        const snakeBody = [];
+
+        let foodX, foodY;
+
+        let score = 0;
+
+        let gameOver = false;
+        function moveSnake() {
+            if (gameOver) {
+                return;
+            }
+
+            const newSnakeX = snakeX + dx;
+            const newSnakeY = snakeY + dy;
+
+            if (
+                newSnakeX < 0 ||
+                newSnakeX >= canvas.width ||
+                newSnakeY < 0 ||
+                newSnakeY >= canvas.height ||
+                checkCollision(newSnakeX, newSnakeY, snakeBody)
+            ) {
+                gameOver = true;
+                over = document.getElementById("gameover").innerHTML = "Vesztettél!";
+                restartGame();
+                return;
+                
+            }
+
+            if (newSnakeX === foodX && newSnakeY === foodY) {
+                score++;
+                generateFood();
+            } else {
+                snakeBody.shift();
+            }
+
+            snakeBody.push({ x: newSnakeX, y: newSnakeY });
+
+            snakeX = newSnakeX;
+            snakeY = newSnakeY;
+
+            drawCanvas();
+        }
+
+        function checkCollision(x, y, body) {
+            for (let i = 0; i < body.length; i++) {
+                if (x === body[i].x && y === body[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function generateFood() {
+            foodX = Math.floor(Math.random() * canvas.width / snakeSize) * snakeSize;
+            foodY = Math.floor(Math.random() * canvas.height / snakeSize) * snakeSize;
+
+            if (checkCollision(foodX, foodY, snakeBody)) {
+                generateFood();
+            }
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "red";
+            ctx.fillRect(foodX, foodY, snakeSize, snakeSize);
+            ctx.fillStyle = snakeColor;
+            for (let i = 0; i < snakeBody.length; i++) {
+                ctx.fillRect(snakeBody[i].x, snakeBody[i].y, snakeSize, snakeSize);
+            }
+        }
+
+        function startGame() {
+            generateFood();
+            setInterval(moveSnake, snakeSpeed);
+        }
+
+
+        function restartGame() {
+            snakeX = canvas.width / 2;
+            snakeY = canvas.height / 2;
+            dx = snakeSize;
+            dy = 0;
+            snakeBody.length = 0;
+            score = 0;
+            gameOver = false;
+            generateFood();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp" && dy === 0) {
+                dx = 0;
+                dy = -snakeSize;
+            }
+            if (event.key === "ArrowDown" && dy === 0) {
+                dx = 0;
+                dy = snakeSize;
+            }
+            if (event.key === "ArrowLeft" && dx === 0) {
+                dx = -snakeSize;
+                dy = 0;
+            }
+            if (event.key === "ArrowRight" && dx === 0) {
+                dx = snakeSize;
+                dy = 0;
+            }
+        });
+        startGame();
+    </script>
+</body>
+</html>
