@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mondrian játék</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      font-family: "Poppins", sans-serif;
+      background-color: cornflowerblue;
+    }
+
+    h1 {
+      margin-top: 50px;
+    }
+
+    .area {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .play-area {
+      position: relative;
+      width: 303px;
+      height: 305px;
+      border: 4px solid #3e3838;
+      margin-right: 80px;
+    }
+
+    #initial-area {
+      position: relative;
+      width: 415px;
+      height: 315px;
+      border: 4px solid #353030;
+      margin-right: 80px;
+    }
+
+    .block {
+      position: absolute;
+      border: 4px solid #000;
+      background-color: rgb(174, 50, 50);
+    }
+
+    .material-symbols-outlined {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 10px;
+      scale: 2;
+    }
+
+    a {
+      color: #000;
+    }
+
+    .back-button {
+      display: inline-block;
+      color: rgb(12, 7, 7);
+      padding: 40px 20px; 
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mondrian Blocks</h1>
+
+  <div class="area">
+    <div class="play-area" id="initial-area" ondrop="drop(event, 'initial-area')" ondragover="allowDrop(event)"></div>
+    <div class="play-area" id="play-area" ondrop="drop(event, 'play-area')" ondragover="allowDrop(event)"></div>
+  </div>
+  <a href="/mondrian.html" class="back-button">Újra</a>
+
+  <script>
+    let dragged = null;
+    let blokkok = [];
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      dragged = event.target;
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function drop(event, areaId) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const droppedElement = document.getElementById(data);
+
+      const targetArea = document.getElementById(areaId);
+      const rect = targetArea.getBoundingClientRect();
+
+      const offsetX = event.clientX - rect.left;
+      const offsetY = event.clientY - rect.top;
+
+      const closestPosition = getClosestPosition(offsetX, offsetY, areaId);
+      droppedElement.style.left = `${closestPosition.x}px`;
+      droppedElement.style.top = `${closestPosition.y}px`;
+
+      if (areaId === "play-area") {
+        document.getElementById(areaId).appendChild(droppedElement);
+        blokkok.push(areaId);
+      }
+
+      checkWin();
+    }
+
+    function generateBlock(id, width, height, rotation, x, y, areaId) {
+      const block = document.createElement("div");
+      block.className = "block";
+      block.id = id;
+      block.style.width = `${width}px`;
+      block.style.height = `${height}px`;
+      block.style.transform = `rotate(${rotation}deg)`;
+      block.style.left = `${x}px`;
+      block.style.top = `${y}px`;
+      block.draggable = true;
+      document.getElementById(areaId).appendChild(block);
+      if (areaId === "play-area") {
+        block.style.backgroundColor = "black";
+        block.draggable = false;
+      } else {
+        block.addEventListener("dragstart", drag);
+        block.addEventListener("click", () => changeSize(block, areaId));
+      }
+    }
+
+    function changeSize(block, areaId) {
+      const currentWidth = parseInt(block.style.width) || 0;
+      const currentHeight = parseInt(block.style.height) || 0;
+
+      block.style.height = `${currentWidth}px`;
+      block.style.width = `${currentHeight}px`;
+    }
+
+    generateBlock("block2", 100, 100, 0, 100, 0, "initial-area");
+    generateBlock("block3", 200, 200, 0, 200, 100, "initial-area");
+    generateBlock("block4", 100, 100, 0, 300, 0, "initial-area");
+    generateBlock("block5", 100, 200, 0, 200, 100, "play-area");
+    generateBlock("block6", 100, 100, 0, 100, 0, "play-area");
+
+    function getClosestPosition(x, y, areaId) {
+      const predefinedPositions = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 200, y: 0 },
+        { x: 0, y: 100 },
+        { x: 200, y: 100 },
+        { x: 0, y: 200 },
+        { x: 100, y: 200 },
+        { x: 200, y: 200 },
+      ];
+
+      let closestPosition = predefinedPositions[0];
+      let shortestDistance = distance(
+        x,
+        y,
+        closestPosition.x,
+        closestPosition.y
+      );
+
+      for (const position of predefinedPositions) {
+        const dist = distance(x, y, position.x, position.y);
+        if (dist < shortestDistance) {
+          shortestDistance = dist;
+          closestPosition = position;
+        }
+      }
+
+      return closestPosition;
+    }
+
+    function distance(x1, y1, x2, y2) {
+      return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    }
+
+    function checkWin() {
+    }
+  </script>
+</body>
+</html>
+
+
+
+
