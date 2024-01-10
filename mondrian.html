@@ -33,7 +33,6 @@
       width: 303px;
       height: 305px;
       border: 4px solid #3e3838;
-      margin-right: 80px;
     }
 
     #initial-area {
@@ -45,9 +44,13 @@
     }
 
     .block {
+      --main-bg-color: white;
+    }
+
+    .block {
       position: absolute;
       border: 4px solid #000;
-      background-color: rgb(174, 50, 50);
+      background-color: var(--main-bg-color);
     }
 
     .material-symbols-outlined {
@@ -77,9 +80,12 @@
     <div class="play-area" id="initial-area" ondrop="drop(event, 'initial-area')" ondragover="allowDrop(event)"></div>
     <div class="play-area" id="play-area" ondrop="drop(event, 'play-area')" ondragover="allowDrop(event)"></div>
   </div>
-  <a href="/mondrian.html">Újra</a><br>
+  <a href="/mondrian.html" class="back-button">Újra</a><br>
   <a href="tasks.html">Vissza a feladatokhoz</a>
+  <button onclick="changeLevel()">Következő Szint</button>
+
   <script>
+    
     let dragged = null;
     let blokkok = [];
 
@@ -125,6 +131,8 @@
       block.style.left = `${x}px`;
       block.style.top = `${y}px`;
       block.draggable = true;
+      const randomColor = "#"+((1<<24)*Math.random()|0).toString(16); 
+      block.style.setProperty('--main-bg-color', randomColor);
       document.getElementById(areaId).appendChild(block);
       if (areaId === "play-area") {
         block.style.backgroundColor = "black";
@@ -149,10 +157,39 @@
     generateBlock("block5", 100, 200, 0, 200, 100, "play-area");
     generateBlock("block6", 100, 100, 0, 100, 0, "play-area");
 
+    function changeLevel() {
+    clearBlocks();
+    setupNextLevel();
+  }
+
+  function clearBlocks() {
+    // Blokkok törlése a jelenlegi szintről
+    const playArea = document.getElementById("play-area");
+    while (playArea.firstChild) {
+      playArea.removeChild(playArea.firstChild);
+    }
+    const playblocks = document.getElementById("initial-area");
+    while (playblocks.firstChild) {
+      playblocks.removeChild(playblocks.firstChild);
+    }
+  }
+
+  function setupNextLevel() {
+    // Új blokkok hozzáadása a következő szinthez
+    generateBlock("block7", 100, 300, 0, 50, 50, "initial-area");
+    generateBlock("block9", 100, 200, 0, 50, 0, "initial-area");
+    generateBlock("block8", 100, 100, 0, 150, 150, "initial-area");
+    generateBlock("block4", 100, 100, 0, 300, 0, "initial-area");
+    generateBlock("block5", 100, 100, 0, 200, 100, "play-area");
+    // generateBlock("block6", 100, 100, 0, 100, 0, "play-area");
+    generateBlock("block10", 100, 100, 0, 100, 0, "play-area");
+  }
+
     function getClosestPosition(x, y, areaId) {
       const predefinedPositions = [
         { x: 0, y: 0 },
         { x: 100, y: 0 },
+        { x: 100, y: 100 },
         { x: 200, y: 0 },
         { x: 0, y: 100 },
         { x: 200, y: 100 },
@@ -189,7 +226,3 @@
   </script>
 </body>
 </html>
-
-
-
-
