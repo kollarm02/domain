@@ -13,7 +13,7 @@
     h3 {
       text-align: center;
       font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-      font-size:x-large;
+      font-size: x-large;
     }
     a {
       text-decoration: none;
@@ -41,6 +41,13 @@
     .au {
       text-align: center;
     }
+    .game-over {
+      text-align: center;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      color: #e31515;
+      font-size: xx-large;
+      margin-top: 50px;
+    }
   </style>
 </head>
 <body>
@@ -57,15 +64,9 @@
     const columns = 10;
     const board = Array.from({ length: rows }, () => Array(columns).fill(0));
 
-    let currentPiece = {
-      shape: [
-        [1, 1, 1],
-        [0, 0, 1]
+    let currentPiece;
 
-
-    ], 
-      position: { x: 0, y: 0 }
-    };
+    let gameInterval;
 
     function renderBoard() {
       const gameBoard = document.getElementById('game-board');
@@ -75,9 +76,16 @@
         row.forEach((cell, columnIndex) => {
           const cellDiv = document.createElement('div');
           cellDiv.className = 'cell';
-          if (cell === 1 || (currentPiece.shape[rowIndex - currentPiece.position.y] && currentPiece.shape[rowIndex - currentPiece.position.y][columnIndex - currentPiece.position.x])) {
-            cellDiv.style.backgroundColor = 'yellow';
+
+          if (cell !== 0) {
+            cellDiv.style.backgroundColor = cell.color; 
+          } else if (
+            currentPiece.shape[rowIndex - currentPiece.position.y] &&
+            currentPiece.shape[rowIndex - currentPiece.position.y][columnIndex - currentPiece.position.x]
+          ) {
+            cellDiv.style.backgroundColor = currentPiece.color; 
           }
+
           gameBoard.appendChild(cellDiv);
         });
       });
@@ -89,6 +97,12 @@
         currentPiece.position.y--;
         mergePiece();
         spawnPiece();
+        if (checkGameOver()) {
+          clearInterval(gameInterval);
+          document.removeEventListener('keydown', handleKeyPress);
+          showGameOver();
+          return;
+        }
       }
       renderBoard();
     }
@@ -136,32 +150,58 @@
       for (let row = 0; row < currentPiece.shape.length; row++) {
         for (let col = 0; col < currentPiece.shape[row].length; col++) {
           if (currentPiece.shape[row][col]) {
-            board[row + currentPiece.position.y][col + currentPiece.position.x] = 1;
+            board[row + currentPiece.position.y][col + currentPiece.position.x] = {
+              color: currentPiece.color
+            };
           }
         }
       }
     }
 
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+
     function spawnPiece() {
+      const shapes = [
+        [[1, 1, 1], [0, 1, 0]],
+        [[1, 1, 1, 1]],
+        [[1, 1], [1, 1]],
+        [[1, 1, 1, 0]],
+        [[1, 1]],
+        [[0, 1], [1, 1]]
+      ];
+
+      const randomIndex = Math.floor(Math.random() * shapes.length);
+
       currentPiece = {
-        shape: [
-          [1, 1, 1],
-          [0, 1, 0]
-        ],
-        position: { x: Math.floor(columns / 2) - 1, y: 0 }
+        shape: shapes[randomIndex],
+        position: { x: Math.floor(columns / 2) - 1, y: 0 },
+        color: getRandomColor()
       };
     }
+    spawnPiece();
 
-    // ciklus
-    function gameLoop() {
-      moveDown();
+    function checkGameOver() {
+      return board[0].some(cell => cell !== 0);
     }
 
-    renderBoard();
-    setInterval(gameLoop, 1000);
+    function showGameOver() {
+      const gameBoard = document.getElementById('game-board');
+      gameBoard.innerHTML = ''; // Törölje a táblát
+      const gameOverDiv = document.createElement('div');
+      gameOverDiv.className = 'game-over';
+      gameOverDiv.innerHTML = '<h1>Game Over</h1>';
+      document.body.appendChild(gameOverDiv);
+    }
 
-    // Gombok funkc.
-    document.addEventListener('keydown', (event) => {
+    function handleKeyPress(event) {
       if (event.key === 'ArrowDown') {
         moveDown();
       } else if (event.key === 'ArrowUp') {
@@ -171,7 +211,15 @@
       } else if (event.key === 'ArrowRight') {
         moveRight();
       }
-    });
+    }
+
+    function gameLoop() {
+      moveDown();
+    }
+
+    renderBoard();
+    gameInterval = setInterval(gameLoop, 1000);
+    document.addEventListener('keydown', handleKeyPress);
   </script>
 </body>
 </html>
