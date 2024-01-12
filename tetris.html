@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetrisz</title>
+  <style>
+    h1 {
+      text-align: center;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      color: #e31515;
+    }
+    h3 {
+      text-align: center;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      font-size:x-large;
+    }
+    a {
+      text-decoration: none;
+    }
+    body {
+      background-color: aquamarine;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(10, 30px);
+      grid-gap: 1px;
+      border: 1px solid #e31515;
+      margin: 20px;
+      width: 311px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cell {
+      width: 30px;
+      height: 30px;
+      background-color: #2dd4b9;
+      border: 1px solid #fff;
+    }
+    .au {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tetrisz játék</h1>
+  <h3> ⬆ - tetrisz forgatása,   ⬇ - gyors levitel(boost),    ⬅ - balra igazít,     ⮕ - jobbra igazít</h3>
+  <div id="game-board"></div><br>
+  <div class="au">
+    <a href="tetris.html">Újra</a><br>
+    <a href="feladatok.html">Vissza a feladatokhoz</a>
+  </div>
+
+  <script>
+    const rows = 20;
+    const columns = 10;
+    const board = Array.from({ length: rows }, () => Array(columns).fill(0));
+
+    let currentPiece = {
+      shape: [
+        [1, 1, 1],
+        [0, 0, 1]
+
+
+    ], 
+      position: { x: 0, y: 0 }
+    };
+
+    function renderBoard() {
+      const gameBoard = document.getElementById('game-board');
+      gameBoard.innerHTML = '';
+
+      board.forEach((row, rowIndex) => {
+        row.forEach((cell, columnIndex) => {
+          const cellDiv = document.createElement('div');
+          cellDiv.className = 'cell';
+          if (cell === 1 || (currentPiece.shape[rowIndex - currentPiece.position.y] && currentPiece.shape[rowIndex - currentPiece.position.y][columnIndex - currentPiece.position.x])) {
+            cellDiv.style.backgroundColor = 'yellow';
+          }
+          gameBoard.appendChild(cellDiv);
+        });
+      });
+    }
+
+    function moveDown() {
+      currentPiece.position.y++;
+      if (checkCollision()) {
+        currentPiece.position.y--;
+        mergePiece();
+        spawnPiece();
+      }
+      renderBoard();
+    }
+
+    function moveLeft() {
+      currentPiece.position.x--;
+      if (checkCollision()) {
+        currentPiece.position.x++;
+      }
+      renderBoard();
+    }
+
+    function moveRight() {
+      currentPiece.position.x++;
+      if (checkCollision()) {
+        currentPiece.position.x--;
+      }
+      renderBoard();
+    }
+
+    function rotate() {
+      const originalShape = currentPiece.shape;
+      currentPiece.shape = currentPiece.shape[0].map((_, i) => currentPiece.shape.map(row => row[i])).reverse();
+      if (checkCollision()) {
+        currentPiece.shape = originalShape;
+      }
+      renderBoard();
+    }
+
+    function checkCollision() {
+      for (let row = 0; row < currentPiece.shape.length; row++) {
+        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+          if (
+            currentPiece.shape[row][col] &&
+            (board[row + currentPiece.position.y] && board[row + currentPiece.position.y][col + currentPiece.position.x]) !== 0
+          ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function mergePiece() {
+      for (let row = 0; row < currentPiece.shape.length; row++) {
+        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+          if (currentPiece.shape[row][col]) {
+            board[row + currentPiece.position.y][col + currentPiece.position.x] = 1;
+          }
+        }
+      }
+    }
+
+    function spawnPiece() {
+      currentPiece = {
+        shape: [
+          [1, 1, 1],
+          [0, 1, 0]
+        ],
+        position: { x: Math.floor(columns / 2) - 1, y: 0 }
+      };
+    }
+
+    // ciklus
+    function gameLoop() {
+      moveDown();
+    }
+
+    renderBoard();
+    setInterval(gameLoop, 1000);
+
+    // Gombok funkc.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') {
+        moveDown();
+      } else if (event.key === 'ArrowUp') {
+        rotate();
+      } else if (event.key === 'ArrowLeft') {
+        moveLeft();
+      } else if (event.key === 'ArrowRight') {
+        moveRight();
+      }
+    });
+  </script>
+</body>
+</html>
